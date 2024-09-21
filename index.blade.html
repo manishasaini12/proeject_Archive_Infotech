@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>User Management</title>
+    <script>
+      document
+        .querySelector('input[name="profile_image"]')
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const img = document.createElement("img");
+              img.src = e.target.result;
+              img.width = 200; // Set desired width
+              document.body.appendChild(img); // Append to body or a specific container
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+    </script>
+  </head>
+  <body>
+    <h1>User Management</h1>
+    <a href="{{ route('users.create') }}">Add User</a>
+    @if(session('success'))
+    <div>{{ session('success') }}</div>
+    @endif
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Mobile</th>
+          <th>Address</th>
+          <th>Profile Image</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($users as $user)
+        <tr>
+          <td>{{ $user->id }}</td>
+          <td>{{ $user->name }}</td>
+          <td>{{ $user->email }}</td>
+          <td>{{ $user->mobile }}</td>
+          <td>{{ $user->address }}</td>
+          <td>
+            <img
+              src="{{ asset('storage/' . $user->profile_image) }}"
+              width="50"
+            />
+          </td>
+          <td>
+            <a href="{{ route('users.edit', $user) }}">Edit</a>
+            <form
+              action="{{ route('users.destroy', $user) }}"
+              method="POST"
+              style="display: inline"
+            >
+              @csrf @method('DELETE')
+              <button type="submit">Delete</button>
+            </form>
+            <a href="{{ route('users.show', $user) }}">View</a>
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+    {{ $users->links() }} @if(session('success'))
+    <div>{{ session('success') }}</div>
+    @endif
+  </body>
+</html>
